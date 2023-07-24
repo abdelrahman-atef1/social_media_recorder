@@ -18,8 +18,14 @@ class SocialMediaRecorder extends StatefulWidget {
   /// function reture the recording sound file
   final Function(File soundFile) sendRequestFunction;
 
-  /// recording Icon That pressesd to start record
+  /// function that returns the state of record bar [isShown] and [isLocked]
+  final Function(bool isShown, bool isLocke)? onStatusChange;
+
+  /// recording Icon That pressed to start record
   final Widget? recordIcon;
+
+  /// The Size of the record icon which includes padding.all(4)
+  final double recordIconSize;
 
   /// recording Icon when user locked the record
   final Widget? recordIconWhenLockedRecord;
@@ -38,6 +44,9 @@ class SocialMediaRecorder extends StatefulWidget {
 
   /// text to know user should drag in the left to cancel record
   final String? slideToCancelText;
+
+  /// The colors to animate between for the [slideToCancel] Text
+  final List<Color>? slideToCancelAnimationColors;
 
   /// use to change slide to cancel textstyle
   final TextStyle? slideToCancelTextStyle;
@@ -62,6 +71,11 @@ class SocialMediaRecorder extends StatefulWidget {
 
   // use to change lock icon to design you need it
   final Widget? lockButton;
+
+  // The required drag top distance to activate lock, 
+  // also controls distance between record button and lock.
+  final double lockDragDistance;
+
   // use it to change send button when user lock the record
   final Widget? sendButtonIcon;
 
@@ -70,8 +84,11 @@ class SocialMediaRecorder extends StatefulWidget {
     this.sendButtonIcon,
     this.storeSoundRecoringPath = "",
     required this.sendRequestFunction,
+    this.onStatusChange,
     this.recordIcon,
+    this.recordIconSize = 35,
     this.lockButton,
+    this.lockDragDistance = 60,
     this.counterBackGroundColor,
     this.recordIconWhenLockedRecord,
     this.recordIconBackGroundColor = Colors.blue,
@@ -81,6 +98,7 @@ class SocialMediaRecorder extends StatefulWidget {
     this.counterTextStyle,
     this.slideToCancelTextStyle,
     this.slideToCancelText = " Slide to Cancel >",
+    this.slideToCancelAnimationColors,
     this.cancelText = "Cancel",
     this.encode = AudioEncoderType.AAC,
     this.cancelTextBackGroundColor,
@@ -94,17 +112,29 @@ class SocialMediaRecorder extends StatefulWidget {
 
 class _SocialMediaRecorder extends State<SocialMediaRecorder> {
   late SoundRecordNotifier soundRecordNotifier;
-
+  bool lastIsShow = false;
+  bool lastIsLocked = false;
   @override
   void initState() {
-    soundRecordNotifier = SoundRecordNotifier();
+    soundRecordNotifier = SoundRecordNotifier(
+      dragDistance: widget.lockDragDistance
+    );
+    if(widget.onStatusChange != null) {
+      soundRecordNotifier.addListener(_onStatusChangeListener);
+    }
     soundRecordNotifier.initialStorePathRecord =
         widget.storeSoundRecoringPath ?? "";
     soundRecordNotifier.isShow = false;
     soundRecordNotifier.voidInitialSound();
     super.initState();
   }
-
+  void _onStatusChangeListener () {
+    if(lastIsShow != soundRecordNotifier.isShow || lastIsLocked != soundRecordNotifier.isLocked){
+      lastIsShow = soundRecordNotifier.isShow;
+      lastIsLocked = soundRecordNotifier.isLocked;
+      widget.onStatusChange!(soundRecordNotifier.isShow,soundRecordNotifier.isLocked);
+    }
+  }
   @override
   void dispose() {
     super.dispose();
@@ -184,10 +214,11 @@ class _SocialMediaRecorder extends State<SocialMediaRecorder> {
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: soundRecordNotifier.isShow ? 0 : 300),
-        height: 50,
+        height: widget.recordIconSize + 10,
+        alignment: Alignment.center,
         width: (soundRecordNotifier.isShow)
             ? MediaQuery.of(context).size.width
-            : 40,
+            : widget.recordIconSize + 5,
         child: Stack(
           children: [
             Padding(
@@ -203,17 +234,24 @@ class _SocialMediaRecorder extends State<SocialMediaRecorder> {
                 ),
                 child: Stack(
                   children: [
-                    ShowMicWithText(
-                      counterBackGroundColor: widget.counterBackGroundColor,
-                      backGroundColor: widget.recordIconBackGroundColor,
-                      recordIcon: widget.recordIcon,
-                      shouldShowText: soundRecordNotifier.isShow,
-                      soundRecorderState: state,
-                      slideToCancelTextStyle: widget.slideToCancelTextStyle,
-                      slideToCancelText: widget.slideToCancelText,
+                    Positioned.fill(
+                      child: Center(
+                        child: ShowMicWithText(
+                          counterBackGroundColor: widget.counterBackGroundColor,
+                          backGroundColor: widget.recordIconBackGroundColor,
+                          recordIcon: widget.recordIcon,
+                          recordIconSize: widget.recordIconSize,
+                          shouldShowText: soundRecordNotifier.isShow,
+                          soundRecorderState: state,
+                          slideToCancelTextStyle: widget.slideToCancelTextStyle,
+                          slideToCancelText: widget.slideToCancelText,
+                          slideToCancelAnimationColors: widget.slideToCancelAnimationColors,
+                        ),
+                      ),
                     ),
                     if (soundRecordNotifier.isShow)
                       ShowCounter(
+                          counterTextStyle: widget.counterTextStyle,
                           counterBackGroundColor: widget.counterBackGroundColor,
                           soundRecorderState: state),
                   ],

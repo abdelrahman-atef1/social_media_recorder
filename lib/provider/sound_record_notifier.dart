@@ -58,6 +58,9 @@ class SoundRecordNotifier extends ChangeNotifier {
   /// store the value we draggble to the top
   late double heightPosition;
 
+  /// The required drag top distance to activate lock
+  final double dragDistance;
+
   /// store status of record if lock change to true else
   /// false
   late bool lockScreenRecord;
@@ -65,6 +68,7 @@ class SoundRecordNotifier extends ChangeNotifier {
   late AudioEncoderType encode;
   // ignore: sort_constructors_first
   SoundRecordNotifier({
+    required this.dragDistance,
     this.edge = 0.0,
     this.minute = 0,
     this.second = 0,
@@ -148,10 +152,10 @@ class SoundRecordNotifier extends ChangeNotifier {
       double hightValue = currentButtonHeihtPlace - x.dy;
 
       /// if reached to the max draggable value in the top
-      if (hightValue >= 50) {
+      if (hightValue >= dragDistance) {
         isLocked = true;
         lockScreenRecord = true;
-        hightValue = 50;
+        hightValue = dragDistance;
         notifyListeners();
       }
       if (hightValue < 0) hightValue = 0;

@@ -68,8 +68,8 @@ class SoundRecorderWhenLockedDesign extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeIn,
-                    width: 50,
-                    height: 50,
+                    width: 40,
+                    height: 40,
                     child: Container(
                       color: recordIconWhenLockBackGroundColor,
                       child: Padding(

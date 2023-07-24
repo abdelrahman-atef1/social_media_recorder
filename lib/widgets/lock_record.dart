@@ -20,26 +20,28 @@ class LockRecord extends StatefulWidget {
 }
 
 class _LockRecordState extends State<LockRecord> with TickerProviderStateMixin {
+  double get maxDragDistance => widget.soundRecorderState.dragDistance;
   @override
   Widget build(BuildContext context) {
     /// If click the Button Then send show lock and un lock icon
-    if (!widget.soundRecorderState.buttonPressed) return Container();
+    if (!widget.soundRecorderState.buttonPressed) return const SizedBox();
+    print(widget.soundRecorderState.second % 2 == 0 );
     return AnimatedPadding(
       duration: const Duration(seconds: 1),
       padding:
-          EdgeInsets.all(widget.soundRecorderState.second % 2 == 0 ? 0 : 8),
+          EdgeInsets.all(widget.soundRecorderState.second % 2 == 0 ? 0 : 5),
       child: Transform.translate(
-        offset: const Offset(0, -70),
+        offset: Offset(0, -maxDragDistance),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: AnimatedOpacity(
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeIn,
-            opacity: widget.soundRecorderState.edge >= 50 ? 0 : 1,
+            opacity: widget.soundRecorderState.edge >= maxDragDistance ? 0 : 1,
             child: Container(
-              height: 50 - widget.soundRecorderState.heightPosition < 0
+              height: maxDragDistance - widget.soundRecorderState.heightPosition < 0
                   ? 0
-                  : 50 - widget.soundRecorderState.heightPosition,
+                  : maxDragDistance - widget.soundRecorderState.heightPosition,
               color: Colors.grey.shade100,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),

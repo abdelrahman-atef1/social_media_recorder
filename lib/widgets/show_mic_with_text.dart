@@ -11,8 +11,10 @@ class ShowMicWithText extends StatelessWidget {
   final String? slideToCancelText;
   final SoundRecordNotifier soundRecorderState;
   final TextStyle? slideToCancelTextStyle;
+  final List<Color>? slideToCancelAnimationColors;
   final Color? backGroundColor;
   final Widget? recordIcon;
+  final double recordIconSize;
   final Color? counterBackGroundColor;
   // ignore: sort_constructors_first
   ShowMicWithText({
@@ -23,7 +25,9 @@ class ShowMicWithText extends StatelessWidget {
     required this.slideToCancelTextStyle,
     required this.slideToCancelText,
     required this.recordIcon,
+    required this.recordIconSize,
     required this.counterBackGroundColor,
+    this.slideToCancelAnimationColors,
   }) : super(key: key);
   final colorizeColors = [
     Colors.black,
@@ -51,19 +55,19 @@ class ShowMicWithText extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeIn,
-                  width: soundRecorderState.buttonPressed ? 50 : 35,
-                  height: soundRecorderState.buttonPressed ? 50 : 35,
+                  width: soundRecorderState.buttonPressed ? recordIconSize + 15 : recordIconSize,
+                  height: soundRecorderState.buttonPressed ? recordIconSize + 15 : recordIconSize,
                   child: Container(
                     color: (soundRecorderState.buttonPressed)
                         ? backGroundColor ??
                             Theme.of(context).colorScheme.secondary
                         : Colors.transparent,
                     child: Padding(
-                      padding: const EdgeInsets.all(4.0),
+                      padding: const EdgeInsets.all(0.0),
                       child: recordIcon ??
                           Icon(
                             Icons.mic,
-                            size: 28,
+                            size: recordIconSize,
                             color: (soundRecorderState.buttonPressed)
                                 ? Colors.grey.shade200
                                 : Colors.black,
@@ -90,7 +94,7 @@ class ShowMicWithText extends StatelessWidget {
                     ColorizeAnimatedText(
                       slideToCancelText ?? "",
                       textStyle: slideToCancelTextStyle ?? colorizeTextStyle,
-                      colors: colorizeColors,
+                      colors: slideToCancelAnimationColors ?? colorizeColors,
                     ),
                   ],
                   isRepeatingAnimation: true,
