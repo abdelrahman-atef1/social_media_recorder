@@ -1,4 +1,4 @@
-library social_media_recorder;
+library;
 
 import 'dart:io';
 import 'package:flutter/material.dart';
